@@ -2,16 +2,19 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UI;
 
 public class ZombieMovement : MonoBehaviour
 {
     public NavMeshAgent zombie;
     public Transform zombPos;
+   
     public int hit = 0;
    // public Transform player;
     void Start()
     {
         zombie = GetComponent<NavMeshAgent>();
+       
     }
 
     // Update is called once per frame
@@ -28,7 +31,7 @@ public class ZombieMovement : MonoBehaviour
 
     private void OnTriggerEnter(Collider collider)
     {
-        if (collider.tag == "Bullet")
+        if (collider.tag == "Bullet" || collider.tag == "Turret Bullet")
         {
             hit += 1;
         }

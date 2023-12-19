@@ -9,6 +9,7 @@ TagManager:
   - Zombie
   - Turret
   - Bullet
+  - Turret Bullet
   layers:
   - Default
   - TransparentFX

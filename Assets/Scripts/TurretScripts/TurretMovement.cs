@@ -1,10 +1,13 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 
 public class TurretMovement : MonoBehaviour
 {
     public GameObject turretBody;
     public GameObject turretBarrel;
-    //public GameObject zombie;
+    public List<GameObject> zombies = new List<GameObject>();
+
 
 
     public Transform bulletPos;
@@ -37,7 +40,10 @@ public class TurretMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        if(zombies.Count > 0) 
+        {
+            ShootEnemy();
+        }
     
 
         if (scanning)
@@ -87,29 +93,34 @@ public class TurretMovement : MonoBehaviour
     }
     void ShootEnemy()
     {
-        scanning = false;
-
-        turretBody.transform.LookAt(GameObject.Find("Zombie(Clone)").transform);
-        bulletTimer += Time.deltaTime;
-        if (bulletTimer > .5f)
+        
+        
+        for (int i = 0; i < zombies.Count; i++) 
         {
-            GameObject newBullet = Instantiate(bulletPrefab, bulletPos.position, bulletPos.rotation);
-            Rigidbody rb = newBullet.GetComponent<Rigidbody>();
-            if (rb != null)
+            if (zombies[i] == null) 
             {
-                rb.velocity = bulletPos.forward * bulletSpeed;
+                zombies.Remove(zombies[i]);
+                scanning = true;
             }
+            else 
+            {
+                scanning = false;
+                turretBody.transform.LookAt(zombies[i].transform);
+                bulletTimer += Time.deltaTime;
+                if (bulletTimer > 7f)
+                {
+                    GameObject newBullet = Instantiate(bulletPrefab, bulletPos.position, bulletPos.rotation);
+                    Rigidbody rb = newBullet.GetComponent<Rigidbody>();
+                    if (rb != null)
+                    {
+                        rb.velocity = bulletPos.forward * bulletSpeed;
+                    }
 
-            bulletTimer = 0;
+                    bulletTimer = 0;
+                }
+            }
+                
         }
-
-      
-
-
-
-
-
-;
     }
 
   
@@ -117,24 +128,18 @@ public class TurretMovement : MonoBehaviour
     {
         if (other.tag == "Zombie") 
         {
-            ShootEnemy();
+            zombies.Add(other.gameObject);
         }
     }
 
-    private void OnTriggerExit(Collider other)
-    {
-        if (other.tag == "Zombie")
-        {
-            scanning =true;
-        }
-    }
+   
     void Ray()
     {
         transform.Rotate(Vector3.up * rayDistance * Time.deltaTime);
         Ray ray = new Ray(rayPos.position, rayPos.forward);
         RaycastHit hit;
         Debug.DrawRay(rayPos.position, ray.direction * rayDistance, Color.green);
-        if (Physics.Raycast(ray, out hit, rayDistance) && hit.transform.name == "Zombie")
+        if (Physics.Raycast(ray, out hit, rayDistance) && hit.transform.tag == "Zombie")
         {
             Debug.Log("Zombie Detected");
             ShootEnemy();
